@@ -3,6 +3,7 @@ package com.example.library.project.demo.service;
 import com.example.library.project.demo.entity.Book;
 import com.example.library.project.demo.entity.Loan;
 import com.example.library.project.demo.entity.User;
+import com.example.library.project.demo.exception.LoanException;
 import com.example.library.project.demo.repository.BookRepository;
 import com.example.library.project.demo.repository.LoanRepository;
 import com.example.library.project.demo.repository.UserRepository;
@@ -29,19 +30,19 @@ public class LoanService {
         this.bookRepository = bookRepository;
     }
 
-    public Loan borrowBook(int userId, int bookId) {
+    public Loan borrowBook(int userId, String isbn) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> LoanException.create("User not found"));
 
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> LoanException.create("Book not found"));
 
         if (book.getAvailableCopies() <= 0) {
-            throw new RuntimeException("No copies available");
+            throw LoanException.create("No copies available");
         }
         // User cannot borrow a book if they have a credit
         if (user.getCredit() > 0){
-            throw new RuntimeException("Cannot borrow a book with a positive credit");
+            throw LoanException.create("Cannot borrow a book with a positive credit");
         } else {
             book.setAvailableCopies(book.getAvailableCopies() - 1);
             Loan loan = new Loan();
@@ -57,16 +58,16 @@ public class LoanService {
         }
     }
 
-    public Loan returnBook(int userId, int bookId) {
+    public Loan returnBook(int userId, String isbn) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> LoanException.create("User not found"));
 
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> LoanException.create("Book not found"));
 
         Loan loan = loanRepository
                 .findByBookAndUserAndReturnDateIsNull(book, user)
-                .orElseThrow(() -> new RuntimeException("Book was never borrowed or already returned"));
+                .orElseThrow(() -> LoanException.create("Book was never borrowed or already returned"));
 
         LocalDate currentDate = LocalDate.now();
         LocalDate dueDate = loan.getDueDate().toLocalDate();
@@ -87,7 +88,7 @@ public class LoanService {
     // Find all currently borrowed books by a userId
     public List<Book> getCurrentlyBorrowedBooks(int userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> LoanException.create("User not found"));
         return loanRepository.findByUserAndReturnDateIsNull(user)
                 .stream()
                 .map(Loan::getBook)
@@ -97,27 +98,27 @@ public class LoanService {
     // Find all previously borrowed books by a userId
     public List<Book> getPreviouslyBorrowedBooks(int userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> LoanException.create("User not found"));
         return loanRepository.findByUserAndReturnDateIsNotNull(user)
                 .stream()
                 .map(Loan::getBook)
                 .collect(Collectors.toList());
     }
 
-    // Find all users who have currently borrowed a book by its id
-    public List<User> getUsersCurrentlyBorrowedBook(int bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+    // Find all users who have currently borrowed a book by its isbn
+    public List<User> getUsersCurrentlyBorrowedBook(String isbn) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> LoanException.create("Book not found"));
         return loanRepository.findByBookAndReturnDateIsNull(book)
                 .stream()
                 .map(Loan::getUser)
                 .collect(Collectors.toList());
     }
 
-    // Find all users who have previously borrowed a book by its id
-    public List<User> getUsersPreviouslyBorrowedBook(int bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+    // Find all users who have previously borrowed a book by its isbn
+    public List<User> getUsersPreviouslyBorrowedBook(String isbn) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> LoanException.create("Book not found"));
         return loanRepository.findByBookAndReturnDateIsNotNull(book)
                 .stream()
                 .map(Loan::getUser)

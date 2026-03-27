@@ -42,8 +42,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable Integer userId) {
-        return userService.getUserById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userService.getUserById(userId);
     }
 
     @Transactional

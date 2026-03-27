@@ -24,14 +24,14 @@ public class LoanController {
     @PostMapping("/borrow")
     @ResponseStatus(HttpStatus.CREATED)
     public Loan borrowBook(@RequestParam Integer userId,
-                           @RequestParam Integer bookId) {
-        return loanService.borrowBook(userId, bookId);
+                           @RequestParam String isbn) {
+        return loanService.borrowBook(userId, isbn);
     }
 
     @PostMapping("/return")
     public Loan returnBook(@RequestParam Integer userId,
-                           @RequestParam Integer bookId) {
-        return loanService.returnBook(userId, bookId);
+                           @RequestParam String isbn) {
+        return loanService.returnBook(userId, isbn);
     }
 
     @GetMapping("/user/{userId}/current")
@@ -44,13 +44,13 @@ public class LoanController {
         return loanService.getPreviouslyBorrowedBooks(userId);
     }
     
-    @GetMapping("/book/{bookId}/current-users")
-    public List<User> getUsersCurrentlyBorrowedBook(@PathVariable Integer bookId) {
-        return loanService.getUsersCurrentlyBorrowedBook(bookId);
+    @GetMapping("/book/{isbn}/current-users")
+    public List<User> getUsersCurrentlyBorrowedBook(@PathVariable String isbn) {
+        return loanService.getUsersCurrentlyBorrowedBook(isbn);
     }
 
-    @GetMapping("/book/{bookId}/history-users")
-    public List<User> getUsersPreviouslyBorrowedBook(@PathVariable Integer bookId) {
-        return loanService.getUsersPreviouslyBorrowedBook(bookId);
+    @GetMapping("/book/{isbn}/history-users")
+    public List<User> getUsersPreviouslyBorrowedBook(@PathVariable String isbn) {
+        return loanService.getUsersPreviouslyBorrowedBook(isbn);
     }
 }

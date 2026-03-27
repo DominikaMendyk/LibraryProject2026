@@ -5,7 +5,6 @@ import com.example.library.project.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/book")
@@ -23,10 +22,14 @@ public class BookController {
         return bookService.addBook(book);
     }
 
-    @DeleteMapping("/remove/{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void removeBook(@PathVariable Integer id) {
-        bookService.deleteBook(id);
+    @DeleteMapping("/remove/{isbn}")
+    public String removeBook(@PathVariable String isbn) {
+        return bookService.deleteBook(isbn);
+    }
+
+    @DeleteMapping("/remove/{isbn}/{copies}")
+    public Book removeBook(@PathVariable String isbn, @PathVariable Integer copies) {
+        return bookService.removeCopies(isbn, copies);
     }
 
     @GetMapping("/getAll")
@@ -34,14 +37,13 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
-    @GetMapping("/{id}")
-    public Book getBookById(@PathVariable Integer id) {
-        Optional<Book> book = bookService.getBookById(id);
-        return book.orElseThrow(() -> new RuntimeException("Book not found"));
+    @GetMapping("/{isbn}")
+    public Book getBookByIsbn(@PathVariable String isbn) {
+        return bookService.getBookByIsbn(isbn);
     }
 
-    @PutMapping("/update/{id}")
-    public Book updateBook(@PathVariable Integer id, @RequestBody Book updatedBook) {
-        return bookService.updateBook(id, updatedBook);
+    @PutMapping("/update/{isbn}")
+    public Book updateBook(@PathVariable String isbn, @RequestBody Book updatedBook) {
+        return bookService.updateBook(isbn, updatedBook);
     }
 }

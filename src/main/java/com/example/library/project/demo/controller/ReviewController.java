@@ -1,6 +1,7 @@
 package com.example.library.project.demo.controller;
 
 import com.example.library.project.demo.entity.Review;
+import com.example.library.project.demo.exception.ReviewException;
 import com.example.library.project.demo.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,8 +33,7 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable Integer id) {
-        return reviewService.getReviewById(id)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
+        return reviewService.getReviewById(id);
     }
 
     @DeleteMapping("/remove/{id}")
