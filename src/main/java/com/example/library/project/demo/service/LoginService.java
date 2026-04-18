@@ -30,7 +30,7 @@ public class LoginService {
         } else{
             User user = list.iterator().next();
             if (passwordEncoder.matches(password, user.getPassword())) {
-                return jwtTokenService.generateToken(username, user.getRole());
+                return jwtTokenService.generateToken(username, user.getRole(), user.getUserId());
             } else{
                 throw LoginPasswordException.create("Incorrect login or password");
             }

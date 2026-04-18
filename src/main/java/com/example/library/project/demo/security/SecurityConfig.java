@@ -42,7 +42,11 @@ public class SecurityConfig {
                                 authorizationManagerRequestMatcherRegistry
                                         .requestMatchers("/login").permitAll()
                                         .requestMatchers("/user/add").hasRole("LIBRARIAN")
+                                        .requestMatchers("/user/borrow/").hasRole("READER")
+                                        .requestMatchers("/user/return/").hasRole("READER")
                                         .requestMatchers("/user/who-am-i").permitAll()
+                                        .requestMatchers("/user/my-currently-borrowed").hasRole("READER")
+                                        .requestMatchers("/user/my-loan-history").hasRole("READER")
                                         .requestMatchers("/user/**").hasRole("LIBRARIAN")
                                         .requestMatchers("/book/add").hasRole("LIBRARIAN")
                                         .requestMatchers("/book/remove/**").hasRole("LIBRARIAN")

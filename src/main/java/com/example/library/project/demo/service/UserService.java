@@ -1,5 +1,6 @@
 package com.example.library.project.demo.service;
 
+import com.example.library.project.demo.entity.Role;
 import com.example.library.project.demo.entity.User;
 import com.example.library.project.demo.exception.UserException;
 import com.example.library.project.demo.repository.UserRepository;
@@ -43,6 +44,10 @@ public class UserService {
 
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Iterable<User> getAllUsersByRole(Role role){
+        return userRepository.findAllByRole(role);
     }
 
     public User getUserById(Integer userId) {

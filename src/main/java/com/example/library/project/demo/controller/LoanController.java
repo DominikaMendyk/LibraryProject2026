@@ -1,6 +1,8 @@
 package com.example.library.project.demo.controller;
 
 import com.example.library.project.demo.entity.Book;
+import com.example.library.project.demo.entity.DTO.BookLoanDTO;
+import com.example.library.project.demo.entity.DTO.LoanHistoryDTO;
 import com.example.library.project.demo.entity.Loan;
 import com.example.library.project.demo.entity.User;
 import com.example.library.project.demo.service.LoanService;
@@ -35,22 +37,22 @@ public class LoanController {
     }
 
     @GetMapping("/user/{userId}/current")
-    public List<Book> getCurrentlyBorrowedBooks(@PathVariable Integer userId) {
+    public List<LoanHistoryDTO> getCurrentlyBorrowedBooks(@PathVariable Integer userId) {
         return loanService.getCurrentlyBorrowedBooks(userId);
     }
 
     @GetMapping("/user/{userId}/history")
-    public List<Book> getPreviouslyBorrowedBooks(@PathVariable Integer userId) {
+    public List<LoanHistoryDTO> getPreviouslyBorrowedBooks(@PathVariable Integer userId) {
         return loanService.getPreviouslyBorrowedBooks(userId);
     }
     
     @GetMapping("/book/{isbn}/current-users")
-    public List<User> getUsersCurrentlyBorrowedBook(@PathVariable String isbn) {
+    public List<BookLoanDTO> getUsersCurrentlyBorrowedBook(@PathVariable String isbn) {
         return loanService.getUsersCurrentlyBorrowedBook(isbn);
     }
 
     @GetMapping("/book/{isbn}/history-users")
-    public List<User> getUsersPreviouslyBorrowedBook(@PathVariable String isbn) {
+    public List<BookLoanDTO> getUsersPreviouslyBorrowedBook(@PathVariable String isbn) {
         return loanService.getUsersPreviouslyBorrowedBook(isbn);
     }
 }
