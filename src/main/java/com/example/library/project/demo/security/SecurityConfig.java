@@ -49,6 +49,8 @@ public class SecurityConfig {
                                         .requestMatchers("/user/borrow/").hasRole("READER")
                                         .requestMatchers("/user/return/").hasRole("READER")
                                         .requestMatchers("/user/who-am-i").permitAll()
+                                        .requestMatchers("/user/me").permitAll()
+                                        .requestMatchers("/user/update-email").permitAll()
                                         .requestMatchers("/user/my-currently-borrowed").hasRole("READER")
                                         .requestMatchers("/user/my-loan-history").hasRole("READER")
                                         .requestMatchers("/user/**").hasRole("LIBRARIAN")

@@ -1,9 +1,11 @@
 package com.example.library.project.demo.controller;
 
 import com.example.library.project.demo.entity.DTO.LoanHistoryDTO;
+import com.example.library.project.demo.entity.DTO.UserProfileDTO;
 import com.example.library.project.demo.entity.Loan;
 import com.example.library.project.demo.entity.Role;
 import com.example.library.project.demo.entity.User;
+import com.example.library.project.demo.repository.UserRepository;
 import com.example.library.project.demo.security.JwtTokenService;
 import com.example.library.project.demo.service.LoanService;
 import com.example.library.project.demo.service.UserService;
@@ -11,12 +13,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -112,5 +116,18 @@ public class UserController {
     @GetMapping("who-am-i")
     public String whoAmI(Authentication authentication){
         return "Username: " + authentication.getName() +", Role: " + authentication.getAuthorities();
+    }
+
+    @GetMapping("/me")
+    public UserProfileDTO getMyProfile(Authentication authentication) {
+        return userService.getProfile(authentication);
+    }
+
+    @PutMapping("/update-email")
+    public String updateEmail( @RequestBody Map<String, String> body, Authentication authentication) {
+        return userService.updateEmail(
+                authentication.getName(),
+                body.get("email")
+        );
     }
 }

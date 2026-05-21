@@ -1,5 +1,6 @@
 package com.example.library.project.demo.service;
 
+import com.example.library.project.demo.entity.DTO.UserProfileDTO;
 import com.example.library.project.demo.entity.Role;
 import com.example.library.project.demo.entity.User;
 import com.example.library.project.demo.exception.UserException;
@@ -7,6 +8,7 @@ import com.example.library.project.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
 
 @Service
 public class UserService {
@@ -76,5 +78,30 @@ public class UserService {
         }
         user.updateCredit(creditToAdd);
         return userRepository.save(user);
+    }
+
+    public UserProfileDTO getProfile(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        String role = authentication.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(Object::toString)
+                .orElse("UNKNOWN");
+        return new UserProfileDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getName(),
+                role
+        );
+    }
+
+    public String updateEmail(String username, String newEmail) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setEmail(newEmail);
+        userRepository.save(user);
+        return "Email updated successfully";
     }
 }

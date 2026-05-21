@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -24,16 +25,17 @@ public class LoginService {
     }
 
     public String login(String username, String password) {
-        Collection<User> list = userRepository.findUserByUsername(username);
-        if (list.isEmpty()) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> LoginPasswordException.create("Incorrect login or password"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw LoginPasswordException.create("Incorrect login or password");
-        } else{
-            User user = list.iterator().next();
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                return jwtTokenService.generateToken(username, user.getRole(), user.getUserId());
-            } else{
-                throw LoginPasswordException.create("Incorrect login or password");
-            }
         }
+
+        return jwtTokenService.generateToken(
+                username,
+                user.getRole(),
+                user.getUserId()
+        );
     }
 }
