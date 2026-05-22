@@ -20,7 +20,7 @@ public class User {
     private Role role; //Enum Reader or Librarian
 
     @Email
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)

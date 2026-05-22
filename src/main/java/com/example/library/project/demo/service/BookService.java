@@ -85,7 +85,6 @@ public class BookService {
                 .map(book -> {
                     book.setTitle(updatedBook.getTitle());
                     book.setAuthor(updatedBook.getAuthor());
-                    book.setIsbn(updatedBook.getIsbn());
                     book.setPublisher(updatedBook.getPublisher());
                     book.setYear(updatedBook.getYearPublished());
                     book.setAvailableCopies(updatedBook.getAvailableCopies());

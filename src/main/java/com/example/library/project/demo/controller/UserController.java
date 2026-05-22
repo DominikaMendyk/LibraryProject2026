@@ -1,5 +1,6 @@
 package com.example.library.project.demo.controller;
 
+import com.example.library.project.demo.entity.Book;
 import com.example.library.project.demo.entity.DTO.LoanHistoryDTO;
 import com.example.library.project.demo.entity.DTO.UserProfileDTO;
 import com.example.library.project.demo.entity.Loan;
@@ -129,5 +130,10 @@ public class UserController {
                 authentication.getName(),
                 body.get("email")
         );
+    }
+
+    @PutMapping("/update/{userId}")
+    public User updateUser(@PathVariable String userId, @RequestBody User updatedUser) {
+        return userService.updateUser(userId, updatedUser);
     }
 }

@@ -1,23 +1,32 @@
 package com.example.library.project.demo.service;
 
+import com.example.library.project.demo.entity.Book;
 import com.example.library.project.demo.entity.DTO.UserProfileDTO;
 import com.example.library.project.demo.entity.Role;
 import com.example.library.project.demo.entity.User;
+import com.example.library.project.demo.exception.BookException;
 import com.example.library.project.demo.exception.UserException;
 import com.example.library.project.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
+import com.example.library.project.demo.security.PasswordEncoderConfig;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -97,11 +106,51 @@ public class UserService {
         );
     }
 
+    @Transactional
     public String updateEmail(String username, String newEmail) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<User> existingUser = userRepository.findByEmail(newEmail);
+        if (existingUser.isPresent() && !Objects.equals(existingUser.get().getUserId(), user.getUserId())) {
+            throw new RuntimeException("Email already in use");
+        }
+
         user.setEmail(newEmail);
         userRepository.save(user);
         return "Email updated successfully";
+    }
+
+    @Transactional
+    public User updateUser(String userId, User updatedUser) {
+        return userRepository.findById(Integer.valueOf(userId))
+                .map(user -> {
+                    if (updatedUser.getEmail() != null &&
+                            !updatedUser.getEmail().equals(user.getEmail())) {
+
+                        Optional<User> existingUser =
+                                userRepository.findByEmail(updatedUser.getEmail());
+
+                        if (existingUser.isPresent() &&
+                                !Objects.equals(existingUser.get().getUserId(), user.getUserId())) {
+                            throw new RuntimeException("Email already in use");
+                        }
+
+                        user.setEmail(updatedUser.getEmail());
+                    }
+
+                    user.setName(updatedUser.getName());
+                    user.setUsername(updatedUser.getUsername());
+                    user.setCredit(updatedUser.getCredit());
+
+                    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+                        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    }
+
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() ->
+                        UserException.create("User not found, cannot be updated")
+                );
     }
 }
